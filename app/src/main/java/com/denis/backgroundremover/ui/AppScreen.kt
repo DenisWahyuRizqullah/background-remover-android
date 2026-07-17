@@ -1,6 +1,7 @@
 package com.denis.backgroundremover.ui
 
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
@@ -34,6 +36,25 @@ fun AppScreen(viewModel: MainViewModel) {
         }
     }
 
+    AppScreenContent(
+        isLoading = viewModel.isLoading,
+        selectedImageUri = viewModel.selectedImageUri,
+        resultImageBytes = viewModel.resultImageBytes,
+        onPickImage = { launcher.launch("image/*") },
+        onRemoveBg = { viewModel.removeBackground() },
+        onSaveImage = { viewModel.saveImage(context.contentResolver) }
+    )
+}
+
+@Composable
+fun AppScreenContent(
+    isLoading: Boolean,
+    selectedImageUri: Uri?,
+    resultImageBytes: ByteArray?,
+    onPickImage: () -> Unit,
+    onRemoveBg: () -> Unit,
+    onSaveImage: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,19 +62,18 @@ fun AppScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (viewModel.selectedImageUri != null && viewModel.resultImageBytes == null) {
+        if (selectedImageUri != null && resultImageBytes == null) {
             AsyncImage(
-                model = viewModel.selectedImageUri,
+                model = selectedImageUri,
                 contentDescription = "Original Image",
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Fit
             )
-        } else if (viewModel.resultImageBytes != null) {
-            val bitmap = remember(viewModel.resultImageBytes) {
-                val bytes = viewModel.resultImageBytes!!
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } else if (resultImageBytes != null) {
+            val bitmap = remember(resultImageBytes) {
+                BitmapFactory.decodeByteArray(resultImageBytes, 0, resultImageBytes.size)
             }
             bitmap?.let {
                 Image(
@@ -76,29 +96,29 @@ fun AppScreen(viewModel: MainViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (viewModel.isLoading) {
+        if (isLoading) {
             CircularProgressIndicator()
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { launcher.launch("image/*") }) {
+                Button(onClick = onPickImage) {
                     Text("Pilih Foto")
                 }
 
                 Button(
-                    onClick = { viewModel.removeBackground() },
-                    enabled = viewModel.selectedImageUri != null
+                    onClick = onRemoveBg,
+                    enabled = selectedImageUri != null
                 ) {
                     Text("Hapus Background")
                 }
             }
 
-            if (viewModel.resultImageBytes != null) {
+            if (resultImageBytes != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
-                    onClick = { viewModel.saveImage(context.contentResolver) },
+                    onClick = onSaveImage,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary
@@ -108,5 +128,20 @@ fun AppScreen(viewModel: MainViewModel) {
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AppScreenPreview() {
+    MaterialTheme {
+        AppScreenContent(
+            isLoading = false,
+            selectedImageUri = null,
+            resultImageBytes = null,
+            onPickImage = {},
+            onRemoveBg = {},
+            onSaveImage = {}
+        )
     }
 }
