@@ -3,17 +3,13 @@ plugins {
     // Menambahkan plugin Kotlin serialization agar Ktor bisa membaca data JSON dari API
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
 
-    // MENGIKUTI DOKUMENTASI: Terapkan plugin di modul aplikasi Anda
+    // Kembalikan ke id tanpa version jika sudah ada di root
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
     namespace = "com.denis.backgroundremover"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.denis.backgroundremover"
@@ -64,15 +60,14 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2026.06.00")
     implementation(composeBom)
 
-    // 2. Menambahkan Jetpack Compose Essentials (Hardcoded agar aman dari masalah Version Catalog)
-    val composeVersion = "1.6.8"
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.ui:ui-graphics:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
     // 3. Ktor Client (Untuk koneksi ke REST API Backend Anda)
     val ktorVersion = "2.3.12"
@@ -88,6 +83,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
