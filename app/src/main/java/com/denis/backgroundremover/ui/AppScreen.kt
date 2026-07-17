@@ -94,6 +94,19 @@ fun AppScreen(viewModel: MainViewModel) {
                     Text("Hapus Background")
                 }
             }
+
+            if (viewModel.resultImageBytes != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = { viewModel.saveImage(context.contentResolver) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Text("Simpan ke Galeri")
+                }
+            }
         }
     }
 }
