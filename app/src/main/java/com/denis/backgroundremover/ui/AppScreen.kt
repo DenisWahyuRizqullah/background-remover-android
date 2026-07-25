@@ -7,6 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,8 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppScreen(viewModel: MainViewModel) {
+fun AppScreen(viewModel: MainViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
@@ -36,14 +39,32 @@ fun AppScreen(viewModel: MainViewModel) {
         }
     }
 
-    AppScreenContent(
-        isLoading = viewModel.isLoading,
-        selectedImageUri = viewModel.selectedImageUri,
-        resultImageBytes = viewModel.resultImageBytes,
-        onPickImage = { launcher.launch("image/*") },
-        onRemoveBg = { viewModel.removeBackground() },
-        onSaveImage = { viewModel.saveImage(context.contentResolver) }
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Hapus Background") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Kembali"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            AppScreenContent(
+                isLoading = viewModel.isLoading,
+                selectedImageUri = viewModel.selectedImageUri,
+                resultImageBytes = viewModel.resultImageBytes,
+                onPickImage = { launcher.launch("image/*") },
+                onRemoveBg = { viewModel.removeBackground() },
+                onSaveImage = { viewModel.saveImage(context.contentResolver) }
+            )
+        }
+    }
 }
 
 @Composable
